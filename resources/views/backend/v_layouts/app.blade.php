@@ -158,14 +158,14 @@
                         <!-- Menu Data Produk (Dropdown) -->
                         <li class="sidebar-item">
                             <a class="sidebar-link has-arrow waves-effect waves-dark"
-                               href="javascript:void(0)"
-                               aria-expanded="false">
+                            href="javascript:void(0)"
+                            aria-expanded="false">
                                 <i class="mdi mdi-shopping"></i>
                                 <span class="hide-menu">Data Produk</span>
                             </a>
                             <ul aria-expanded="false" class="collapse first-level">
                                 <li class="sidebar-item">
-                                    <a href="javascript:void(0)" class="sidebar-link">
+                                    <a href="{{ route('backend.kategori.index') }}" class="sidebar-link">
                                         <i class="mdi mdi-chevron-right"></i>
                                         <span class="hide-menu">Kategori</span>
                                     </a>
