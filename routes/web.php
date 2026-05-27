@@ -11,16 +11,23 @@ use App\Http\Controllers\ProdukController;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application.
+|
 */
 
-// Redirect root ke halaman login backend
+// =====================================================================
+// ROUTES PUBLIC
+// =====================================================================
+
 Route::get('/', function () {
     return redirect()->route('backend.login');
 });
 
-// -----------------------------------------------------------------
-// AUTH ROUTES
-// -----------------------------------------------------------------
+// =====================================================================
+// ROUTES AUTHENTICATION
+// =====================================================================
+
 Route::get('backend/login', [LoginController::class, 'loginBackend'])
     ->name('backend.login');
 
@@ -28,35 +35,53 @@ Route::post('backend/login', [LoginController::class, 'authenticateBackend'])
     ->name('backend.authenticate');
 
 Route::post('backend/logout', [LoginController::class, 'logoutBackend'])
-    ->name('backend.logout');
+    ->name('backend.logout')
+    ->middleware('auth');
 
-// -----------------------------------------------------------------
-// PROTECTED ROUTES (Middleware: auth)
-// -----------------------------------------------------------------
+// =====================================================================
+// ROUTES BACKEND (MEMBUTUHKAN AUTH)
+// =====================================================================
+
 Route::middleware('auth')->group(function () {
 
-    // Dashboard / Beranda
+    // --- Beranda ---
     Route::get('backend/beranda', [BerandaController::class, 'berandaBackend'])
         ->name('backend.beranda');
 
-    // User Management
-    Route::resource('backend/user', UserController::class, ['as' => 'backend']);
+    // --- User Management ---
+    Route::resource('backend/user', UserController::class, [
+        'as' => 'backend'
+    ]);
 
-    // Kategori Management
-    Route::resource('backend/kategori', KategoriController::class, ['as' => 'backend']);
+    // --- User Report ---
+    Route::get('backend/laporan/formuser', [UserController::class, 'formUser'])
+        ->name('backend.laporan.formuser');
 
-    // Produk Management (CRUD Utama)
-    Route::resource('backend/produk', ProdukController::class, ['as' => 'backend']);
+    Route::post('backend/laporan/cetakuser', [UserController::class, 'cetakUser'])
+        ->name('backend.laporan.cetakuser');
 
-    // -----------------------------------------------------------------
-    // CUSTOM ROUTES: Foto Produk Tambahan
-    // -----------------------------------------------------------------
+    // --- Kategori Management ---
+    Route::resource('backend/kategori', KategoriController::class, [
+        'as' => 'backend'
+    ]);
 
-    // Tambah foto tambahan
-    Route::post('backend/foto-produk/store', [ProdukController::class, 'storeFoto'])
-        ->name('backend.foto.produk.store');
+    // --- Produk Management ---
+    Route::resource('backend/produk', ProdukController::class, [
+        'as' => 'backend'
+    ]);
 
-    // Hapus foto tambahan
-    Route::delete('backend/foto-produk/{id}', [ProdukController::class, 'destroyFoto'])
-        ->name('backend.foto.produk.destroy');
+    // --- Produk Foto (Custom Routes) ---
+    Route::post('foto-produk/store', [ProdukController::class, 'storeFoto'])
+        ->name('backend.foto_produk.store');
+
+    Route::delete('foto-produk/{id}', [ProdukController::class, 'destroyFoto'])
+        ->name('backend.foto_produk.destroy');
+
+    // --- Produk Report ---
+    Route::get('backend/laporan/formproduk', [ProdukController::class, 'formProduk'])
+        ->name('backend.laporan.formproduk');
+
+    Route::post('backend/laporan/cetakproduk', [ProdukController::class, 'cetakProduk'])
+        ->name('backend.laporan.cetakproduk');
+
 });

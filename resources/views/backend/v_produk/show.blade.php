@@ -150,8 +150,8 @@
                                                     alt="Foto Tambahan"
                                                     onerror="console.log('Gagal load:', this.src);">
 
-                                                <form action="{{ route('backend.foto.produk.destroy', $foto->id) }}"
-                                                      method="POST">
+                                                <form action="{{ route('backend.foto_produk.destroy', $foto->id) }}"
+                                                    method="POST">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
@@ -213,7 +213,7 @@
 
         // Ambil data dari Blade
         const produkId = "{{ $show->id }}";
-        const storeRoute = "{{ route('backend.foto.produk.store') }}";
+        const storeRoute = "{{ route('backend.foto_produk.store') }}";
         const csrfToken = "{{ csrf_token() }}";
 
         console.log('Produk ID:', produkId);

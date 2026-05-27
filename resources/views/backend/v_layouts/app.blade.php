@@ -98,22 +98,25 @@
                                data-toggle="dropdown"
                                aria-haspopup="true"
                                aria-expanded="false">
-                                <!-- Display User Photo -->
                                 @if (Auth::user()->foto)
                                     <img src="{{ asset('storage/img-user/' . Auth::user()->foto) }}"
-                                         alt="{{ Auth::user()->nama }}"
-                                         class="rounded-circle" width="31">
+                                         alt="user"
+                                         class="rounded-circle"
+                                         width="31">
                                 @else
                                     <img src="{{ asset('storage/img-user/img-default.jpg') }}"
-                                         alt="Default Photo"
-                                         class="rounded-circle" width="31">
+                                         alt="user"
+                                         class="rounded-circle"
+                                         width="31">
                                 @endif
                             </a>
                             <div class="dropdown-menu dropdown-menu-right user-dd animated">
                                 <a class="dropdown-item" href="{{ route('backend.user.edit', Auth::user()->id) }}">
                                     <i class="ti-user m-r-5 m-l-5"></i> Profil Saya
                                 </a>
-                                <a class="dropdown-item" href="" onclick="event.preventDefault(); document.getElementById('keluar-app').submit();">
+                                <a class="dropdown-item"
+                                   href=""
+                                   onclick="event.preventDefault(); document.getElementById('keluar-app').submit();">
                                     <i class="fa fa-power-off m-r-5 m-l-5"></i> Keluar
                                 </a>
                                 <div class="dropdown-divider"></div>
@@ -144,7 +147,6 @@
                                 <span class="hide-menu">Beranda</span>
                             </a>
                         </li>
-
                         <!-- Menu User -->
                         <li class="sidebar-item">
                             <a class="sidebar-link waves-effect waves-dark sidebar-link"
@@ -154,12 +156,11 @@
                                 <span class="hide-menu">User</span>
                             </a>
                         </li>
-
                         <!-- Menu Data Produk (Dropdown) -->
                         <li class="sidebar-item">
                             <a class="sidebar-link has-arrow waves-effect waves-dark"
-                            href="javascript:void(0)"
-                            aria-expanded="false">
+                               href="javascript:void(0)"
+                               aria-expanded="false">
                                 <i class="mdi mdi-shopping"></i>
                                 <span class="hide-menu">Data Produk</span>
                             </a>
@@ -172,6 +173,29 @@
                                 </li>
                                 <li class="sidebar-item">
                                     <a href="{{ route('backend.produk.index') }}" class="sidebar-link">
+                                        <i class="mdi mdi-chevron-right"></i>
+                                        <span class="hide-menu">Produk</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Menu Laporan (Dropdown) -->
+                        <li class="sidebar-item">
+                            <a class="sidebar-link has-arrow waves-effect waves-dark"
+                               href="javascript:void(0)"
+                               aria-expanded="false">
+                                <i class="mdi mdi-receipt"></i>
+                                <span class="hide-menu">Laporan</span>
+                            </a>
+                            <ul aria-expanded="false" class="collapse first-level">
+                                <li class="sidebar-item">
+                                    <a href="{{ route('backend.laporan.formuser') }}" class="sidebar-link">
+                                        <i class="mdi mdi-chevron-right"></i>
+                                        <span class="hide-menu">User</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a href="{{ route('backend.laporan.formproduk') }}" class="sidebar-link">
                                         <i class="mdi mdi-chevron-right"></i>
                                         <span class="hide-menu">Produk</span>
                                     </a>
@@ -255,9 +279,13 @@
         $('#zero_config').DataTable();
     </script>
 
-    <!-- ============================================================== -->
+    <!-- form keluar app -->
+    <form id="keluar-app" action="{{ route('backend.logout') }}" method="POST" class="d-none">
+        @csrf
+    </form>
+    <!-- form keluar app end -->
+
     <!-- SweetAlert2 -->
-    <!-- ============================================================== -->
     <script src="{{ asset('sweetalert/sweetalert2.all.min.js') }}"></script>
 
     <!-- Konfirmasi Success -->
@@ -275,7 +303,6 @@
 
     <!-- Konfirmasi Delete -->
     <script type="text/javascript">
-        // Konfirmasi delete
         $('.show_confirm').click(function(event) {
             var form = $(this).closest("form");
             var konfdelete = $(this).data("konf-delete");
@@ -300,13 +327,12 @@
             });
         });
     </script>
-    <!-- End SweetAlert2 -->
 
     <!-- Preview Gambar -->
     <script>
         function previewFoto() {
-            const foto = document.querySelector('input[name=foto]');
-            const fotoPreview = document.querySelector('img.foto-preview');
+            const foto = document.querySelector('input[name="foto"]');
+            const fotoPreview = document.querySelector('.foto-preview');
             fotoPreview.style.display = 'block';
             const fotoReader = new FileReader();
             fotoReader.readAsDataURL(foto.files[0]);
@@ -316,7 +342,6 @@
             }
         }
     </script>
-    <!-- End Preview Gambar -->
 
     <!-- CKEditor -->
     <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
@@ -327,13 +352,6 @@
                 console.error(error);
             });
     </script>
-    <!-- End CKEditor -->
-
-    <!-- form keluar app -->
-    <form id="keluar-app" action="{{ route('backend.logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
-    <!-- form keluar app end -->
 
     @yield('scripts')
 

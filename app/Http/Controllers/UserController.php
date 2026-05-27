@@ -39,15 +39,15 @@ class UserController extends Controller
     {
         // 1. Validasi Input
         $validatedData = $request->validate([
-            'nama' => 'required|max:255',
-            'email' => 'required|max:255|email|unique:user,email',
-            'role' => 'required',
-            'hp' => 'required|min:10|max:13',
-            'password' => 'required|min:4|confirmed',
-            'foto' => 'image|mimes:jpeg,jpg,png,gif|file|max:1024',
+            'nama'      => 'required|max:255',
+            'email'     => 'required|max:255|email|unique:user,email',
+            'role'      => 'required',
+            'hp'        => 'required|min:10|max:13',
+            'password'  => 'required|min:4|confirmed',
+            'foto'      => 'image|mimes:jpeg,jpg,png,gif|file|max:1024',
         ], $messages = [
             'foto.image' => 'Format gambar gunakan file dengan ekstensi jpeg, jpg, png, atau gif.',
-            'foto.max' => 'Ukuran file gambar Maksimal adalah 1024 KB.'
+            'foto.max'   => 'Ukuran file gambar Maksimal adalah 1024 KB.'
         ]);
 
         // Set default status
@@ -59,11 +59,6 @@ class UserController extends Controller
             $extension = $file->getClientOriginalExtension();
             $originalFileName = date('YmdHis') . '_' . uniqid() . '.' . $extension;
             $directory = 'storage/img-user/';
-
-            // Pastikan direktori ada
-            if (!file_exists(public_path($directory))) {
-                mkdir(public_path($directory), 0755, true);
-            }
 
             // Simpan & resize gambar (385x400)
             ImageHelper::uploadAndResize($file, $directory, $originalFileName, 385, 400);
@@ -110,7 +105,7 @@ class UserController extends Controller
 
         return view('backend.v_user.edit', [
             'judul' => 'Ubah User',
-            'edit' => $user
+            'edit'  => $user
         ]);
     }
 
@@ -123,17 +118,17 @@ class UserController extends Controller
 
         // Rules validasi
         $rules = [
-            'nama' => 'required|max:255',
-            'role' => 'required',
+            'nama'   => 'required|max:255',
+            'role'   => 'required',
             'status' => 'required',
-            'hp' => 'required|min:10|max:13',
-            'foto' => 'image|mimes:jpeg,jpg,png,gif|file|max:1024',
+            'hp'     => 'required|min:10|max:13',
+            'foto'   => 'image|mimes:jpeg,jpg,png,gif|file|max:1024',
         ];
 
         // Pesan error custom
         $messages = [
             'foto.image' => 'Format gambar gunakan file dengan ekstensi jpeg, jpg, png, atau gif.',
-            'foto.max' => 'Ukuran file gambar Maksimal adalah 1024 KB.'
+            'foto.max'   => 'Ukuran file gambar Maksimal adalah 1024 KB.'
         ];
 
         // Validasi email unik (kecuali email user yang sedang diedit)
@@ -159,11 +154,6 @@ class UserController extends Controller
             $extension = $file->getClientOriginalExtension();
             $originalFileName = date('YmdHis') . '_' . uniqid() . '.' . $extension;
             $directory = 'storage/img-user/';
-
-            // Pastikan direktori ada
-            if (!file_exists(public_path($directory))) {
-                mkdir(public_path($directory), 0755, true);
-            }
 
             // Simpan gambar dengan ukuran yang ditentukan
             ImageHelper::uploadAndResize($file, $directory, $originalFileName, 385, 400);
@@ -193,7 +183,6 @@ class UserController extends Controller
 
             // Cek apakah file foto ada
             if (file_exists($oldImagePath)) {
-                // Hapus file foto
                 unlink($oldImagePath);
             }
         }
@@ -204,5 +193,46 @@ class UserController extends Controller
         // Redirect dengan pesan success
         return redirect()->route('backend.user.index')
             ->with('success', 'Data berhasil dihapus');
+    }
+
+    /**
+     * Show form for user report
+     */
+    public function formUser()
+    {
+        return view('backend.v_user.form', [
+            'judul' => 'Laporan Data User'
+        ]);
+    }
+
+    /**
+     * Print/Cetak user report
+     */
+    public function cetakUser(Request $request)
+    {
+        // Validasi input tanggal
+        $request->validate([
+            'tanggal_awal' => 'required|date',
+            'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
+        ], [
+            'tanggal_awal.required' => 'Tanggal Awal harus diisi.',
+            'tanggal_akhir.required' => 'Tanggal Akhir harus diisi.',
+            'tanggal_akhir.after_or_equal' => 'Tanggal Akhir harus lebih besar atau sama dengan Tanggal Awal.',
+        ]);
+
+        $tanggalAwal = $request->input('tanggal_awal');
+        $tanggalAkhir = $request->input('tanggal_akhir');
+
+        // Query data user berdasarkan rentang tanggal
+        $user = User::whereBetween('created_at', [$tanggalAwal, $tanggalAkhir])
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+        return view('backend.v_user.cetak', [
+            'judul' => 'Laporan User',
+            'tanggalAwal' => $tanggalAwal,
+            'tanggalAkhir' => $tanggalAkhir,
+            'cetak' => $user
+        ]);
     }
 }
