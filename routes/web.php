@@ -7,30 +7,56 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdukController;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Redirect root ke halaman login backend
 Route::get('/', function () {
-    // return view('welcome');
     return redirect()->route('backend.login');
 });
 
-Route::get('backend/beranda', [BerandaController::class, 'berandaBackend'])
-    ->name('backend.beranda')
-    ->middleware('auth');
-
+// -----------------------------------------------------------------
+// AUTH ROUTES
+// -----------------------------------------------------------------
 Route::get('backend/login', [LoginController::class, 'loginBackend'])
     ->name('backend.login');
 
 Route::post('backend/login', [LoginController::class, 'authenticateBackend'])
-    ->name('backend.login');
+    ->name('backend.authenticate');
 
 Route::post('backend/logout', [LoginController::class, 'logoutBackend'])
     ->name('backend.logout');
 
-// Route::resource('backend/user', UserController::class)->middleware('auth');
-Route::resource('backend/user', UserController::class, ['as' => 'backend'])
-    ->middleware('auth');
+// -----------------------------------------------------------------
+// PROTECTED ROUTES (Middleware: auth)
+// -----------------------------------------------------------------
+Route::middleware('auth')->group(function () {
 
-Route::resource('backend/kategori', KategoriController::class, ['as' => 'backend'])
-    ->middleware('auth');
+    // Dashboard / Beranda
+    Route::get('backend/beranda', [BerandaController::class, 'berandaBackend'])
+        ->name('backend.beranda');
 
-Route::resource('backend/produk', ProdukController::class, ['as' => 'backend'])
-    ->middleware('auth');
+    // User Management
+    Route::resource('backend/user', UserController::class, ['as' => 'backend']);
+
+    // Kategori Management
+    Route::resource('backend/kategori', KategoriController::class, ['as' => 'backend']);
+
+    // Produk Management (CRUD Utama)
+    Route::resource('backend/produk', ProdukController::class, ['as' => 'backend']);
+
+    // -----------------------------------------------------------------
+    // CUSTOM ROUTES: Foto Produk Tambahan
+    // -----------------------------------------------------------------
+
+    // Tambah foto tambahan
+    Route::post('backend/foto-produk/store', [ProdukController::class, 'storeFoto'])
+        ->name('backend.foto.produk.store');
+
+    // Hapus foto tambahan
+    Route::delete('backend/foto-produk/{id}', [ProdukController::class, 'destroyFoto'])
+        ->name('backend.foto.produk.destroy');
+});

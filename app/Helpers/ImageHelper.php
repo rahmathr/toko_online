@@ -9,14 +9,6 @@ class ImageHelper
 {
     /**
      * Upload dan resize gambar
-     *
-     * @param UploadedFile $file File gambar yang diupload
-     * @param string $directory Direktori tujuan (relatif terhadap public/)
-     * @param string $fileName Nama file hasil
-     * @param int|null $width Lebar gambar hasil (opsional)
-     * @param int|null $height Tinggi gambar hasil (opsional)
-     * @return string Nama file yang berhasil diupload
-     * @throws \Exception Jika tipe gambar tidak didukung
      */
     public static function uploadAndResize(
         UploadedFile $file,
@@ -46,31 +38,26 @@ class ImageHelper
 
     /**
      * Buat resource gambar dari file path
-     *
-     * @param string $path Path file gambar
-     * @param string $extension Ekstensi file
-     * @return GdImage Object gambar GD
-     * @throws \Exception Jika tipe gambar tidak didukung
      */
     private static function createImageFromPath(string $path, string $extension): GdImage
     {
         switch ($extension) {
             case 'jpeg':
             case 'jpg':
-                $img = imagecreatefromjpeg($path);
+                $img = @imagecreatefromjpeg($path);
                 break;
             case 'png':
-                $img = imagecreatefrompng($path);
+                $img = @imagecreatefrompng($path);
                 break;
             case 'gif':
-                $img = imagecreatefromgif($path);
+                $img = @imagecreatefromgif($path);
                 break;
             default:
                 throw new \Exception('Unsupported image type: ' . $extension);
         }
 
-        if (!$img instanceof GdImage) {
-            throw new \Exception('Failed to create image from path');
+        if ($img === false) {
+            throw new \Exception('Failed to create image from path: ' . $path);
         }
 
         return $img;
@@ -78,11 +65,6 @@ class ImageHelper
 
     /**
      * Resize gambar dengan mempertahankan aspect ratio
-     *
-     * @param GdImage $image Object gambar GD
-     * @param int $width Lebar target
-     * @param int|null $height Tinggi target (opsional)
-     * @return GdImage Object gambar hasil resize
      */
     private static function resizeImage(GdImage $image, int $width, ?int $height = null): GdImage
     {
@@ -105,7 +87,8 @@ class ImageHelper
             $image,
             0, 0, 0, 0,
             $width, $height,
-            $oldWidth, $oldHeight
+            $oldWidth,
+            $oldHeight
         );
 
         imagedestroy($image);
@@ -115,11 +98,6 @@ class ImageHelper
 
     /**
      * Simpan gambar ke file
-     *
-     * @param GdImage $image Object gambar GD
-     * @param string $destinationPath Path file tujuan
-     * @param string $extension Ekstensi file
-     * @return void
      */
     private static function saveImage(GdImage $image, string $destinationPath, string $extension): void
     {

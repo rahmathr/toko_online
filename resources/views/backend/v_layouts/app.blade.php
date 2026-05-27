@@ -302,10 +302,40 @@
     </script>
     <!-- End SweetAlert2 -->
 
+    <!-- Preview Gambar -->
+    <script>
+        function previewFoto() {
+            const foto = document.querySelector('input[name=foto]');
+            const fotoPreview = document.querySelector('img.foto-preview');
+            fotoPreview.style.display = 'block';
+            const fotoReader = new FileReader();
+            fotoReader.readAsDataURL(foto.files[0]);
+            fotoReader.onload = function(fotoEvent) {
+                fotoPreview.src = fotoEvent.target.result;
+                fotoPreview.style.width = '100%';
+            }
+        }
+    </script>
+    <!-- End Preview Gambar -->
+
+    <!-- CKEditor -->
+    <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#ckeditor'))
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+    <!-- End CKEditor -->
+
     <!-- form keluar app -->
     <form id="keluar-app" action="{{ route('backend.logout') }}" method="POST" class="d-none">
         @csrf
     </form>
     <!-- form keluar app end -->
+
+    @yield('scripts')
+
 </body>
 </html>
